@@ -1,5 +1,6 @@
 package com.hamrorestaurant.billing.controller;
 
+import com.hamrorestaurant.billing.model.OrderedFood;
 import com.hamrorestaurant.billing.services.MenuServiceImpl;
 import com.hamrorestaurant.billing.web.rest.common.CommonResponse;
 import com.hamrorestaurant.billing.web.rest.common.ErrorResponse;
@@ -25,10 +26,9 @@ public class CustomerBillingController {
             @ApiResponse(code = 400, message = "Bad Request. Missing required parameters", response = ErrorResponse.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorResponse.class),
             @ApiResponse(code = 200, message = "Array of Lines", response = CommonResponse.class)})
-    @RequestMapping(value="/{tableNumber}", produces = {"application/json"}, method= RequestMethod.GET)
-    public CommonResponse getCustomerBilling(@RequestParam int customerId, @RequestBody List<MenuItem> menuItem){
+    @RequestMapping(value="/getBillAmount", produces = {"application/json"}, method= RequestMethod.PUT)
+    public CommonResponse getCustomerBilling(@RequestBody List<OrderedFood> orderedFoods){
 
-       return menuService.getCustomerMenuItem(customerId, menuItem);
-
+            return menuService.getCustomerMenuItem(orderedFoods);
     }
 }
