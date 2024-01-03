@@ -7,6 +7,7 @@ import java.util.List;
 @Data
 public class CommonResponse {
 
+    private int tableNumber;
     private Object data;
     private List<Object> errors;
     private List<Object> warnings;

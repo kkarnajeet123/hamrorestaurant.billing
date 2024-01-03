@@ -10,4 +10,5 @@ public interface MenuService {
 
 
     CommonResponse getCustomerMenuItem(List<OrderedFood> orderedFoods);
+    CommonResponse getCostOfEachItem(List<OrderedFood> orderedFoods);
 }
