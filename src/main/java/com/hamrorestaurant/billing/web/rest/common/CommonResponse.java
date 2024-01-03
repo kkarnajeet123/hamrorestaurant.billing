@@ -1,6 +1,5 @@
 package com.hamrorestaurant.billing.web.rest.common;
 
-import com.hamrorestaurant.billing.model.BillingCommonResponse;
 import lombok.Data;
 
 import java.util.List;

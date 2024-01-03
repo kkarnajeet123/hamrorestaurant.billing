@@ -1,7 +1,6 @@
 package com.hamrorestaurant.billing.services;
 
 import com.hamrorestaurant.billing.entity.MenuItem;
-import com.hamrorestaurant.billing.model.BillingCommonResponse;
 import com.hamrorestaurant.billing.model.OrderedFood;
 import com.hamrorestaurant.billing.model.OrderedMenu;
 import com.hamrorestaurant.billing.repository.MenuRepository;
@@ -34,7 +33,6 @@ public class MenuServiceImpl implements MenuService {
         List<Double> calculatedTotalforEachItem = calculateTotalPriceOfEachItem(mapItemAndPrice, getOrderItemCount(orderedFoods));
         //Calculating Total Bill Amount
 //        calculatingTotalCost(calculatedTotalforEachItem);
-        BillingCommonResponse commonResponse = new BillingCommonResponse();
         response.setData(calculatingTotalCost(calculatedTotalforEachItem));
         response.setTableNumber(orderedFoods.stream().map(m->m.getTableNumber()).findAny().orElse(null));
         //response.getBillingCommonResponse().setData(commonResponse);
