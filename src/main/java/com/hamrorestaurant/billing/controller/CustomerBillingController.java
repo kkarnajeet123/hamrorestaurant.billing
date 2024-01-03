@@ -31,4 +31,16 @@ public class CustomerBillingController {
 
             return menuService.getCustomerMenuItem(orderedFoods);
     }
+
+    @ApiOperation(
+            value = "Get all user information", notes = "Get All User Information", response = CommonResponse.class, tags = {"CustomerBilling",})
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Bad Request. Missing required parameters", response = ErrorResponse.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = ErrorResponse.class),
+            @ApiResponse(code = 200, message = "Array of Lines", response = CommonResponse.class)})
+    @RequestMapping(value="/getTotalPriceForEachItem", produces = {"application/json"}, method= RequestMethod.PUT)
+    public CommonResponse getCostOfEachItem(@RequestBody List<OrderedFood> orderedFoods){
+
+        return menuService.getCostOfEachItem(orderedFoods);
+    }
 }
