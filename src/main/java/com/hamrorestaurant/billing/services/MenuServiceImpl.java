@@ -34,10 +34,49 @@ public class MenuServiceImpl implements MenuService {
         //Calculating Total Bill Amount
 //        calculatingTotalCost(calculatedTotalforEachItem);
         response.setData(calculatingTotalCost(calculatedTotalforEachItem));
-        response.setTableNumber(orderedFoods.stream().map(m->m.getTableNumber()).findAny().orElse(null));
+        response.setTableNumber(orderedFoods.stream().map(m -> m.getTableNumber()).findAny().orElse(null));
         //response.getBillingCommonResponse().setData(commonResponse);
         return response;
     }
+
+    @Override
+    public CommonResponse getCostOfEachItem(OrderedFood orderedFoods) {
+        CommonResponse response = new CommonResponse();
+        //checking if the requested menu name is available in db or not
+        Map<String, Double> eachItemPriceMap = gettingEachItemPrice(getItemPriceFromDb(), orderedFoods.getMenu());
+        //getting matched item count of order
+        Map<String, Integer> eachMatchedItemCount = gettingEachMatchedItemCount(eachItemPriceMap, orderedFoods);
+        //Map<String, Integer> eachItemCount= countOfEachOrder(orderedFoods);
+        response.setData(getPricePerMenuItem(eachItemPriceMap, eachMatchedItemCount));
+        response.setTableNumber(orderedFoods.getTableNumber());
+        //  List<Double>eachPriceCostList= calculateTotalPriceOfEachItem(eachItemPriceMap, countOfEachOrder(orderedFoods));
+        //   calculatingTotalCost(eachPriceCostList);
+        logger.info("The billing response is: " + response.getData());
+        return response;
+    }
+
+    private Map<String, Integer> gettingEachMatchedItemCount(Map<String, Double> eachItemPriceMap, OrderedFood orderedFoods) {
+        Map<String, Integer> eachMenuCost = new HashMap<>();
+
+        for (OrderedMenu menu : orderedFoods.getMenu()) {
+            if (eachItemPriceMap.containsKey(menu.getItemName())) {
+                eachMenuCost.put(menu.getItemName(), menu.getCount());
+            }
+
+        }
+        return eachMenuCost;
+    }
+
+    private Map<String, Integer> countOfEachOrder(OrderedFood orderedFoods) {
+        Map<String, Integer> mapOfEachOrderCount = new
+                HashMap<>();
+        orderedFoods.getMenu().stream().filter(Objects::nonNull).forEach(f -> {
+            mapOfEachOrderCount.put(f.getItemName(), f.getCount());
+        });
+
+        return mapOfEachOrderCount;
+    }
+
 
     private List<Integer> getEachItemCount(List<OrderedFood> orderedFoods) {
         List<Integer> eachItemCount = new ArrayList<>();
@@ -68,23 +107,13 @@ public class MenuServiceImpl implements MenuService {
         return orderItemCount;
     }
 
-    @Override
-    public CommonResponse getCostOfEachItem(List<OrderedFood> orderedFoods) {
-        CommonResponse response = new CommonResponse();
-        List<OrderedMenu> order = orderedFoods.stream().filter(Objects::nonNull).map(a -> a.getMenu()).findAny().orElse(null);
-        Map<String, Double> mapItemAndPrice = gettingEachItemPrice(getItemPriceFromDb(), order);
-        response.setData(getPricePerMenuItem(mapItemAndPrice, getOrderItemCount(orderedFoods)));
-        response.setTableNumber(orderedFoods.stream().filter(Objects::nonNull).map(a->a.getTableNumber()).findAny().orElse(null));
-        return response;
-    }
 
-
-    private Map<String, Double> gettingEachItemPrice(Map<String, String> itemWithTheirPrice, List<OrderedMenu> orderedFoods) {
+    private Map<String, Double> gettingEachItemPrice(Map<String, String> menuItemFromDb, List<OrderedMenu> orderedFoods) {
         Map<String, Double> matchedItemValue = new HashMap<>();
         for (OrderedMenu key : orderedFoods) {
             orderedFoods.forEach(p -> {
-                if (itemWithTheirPrice.containsKey(p.getItemName())) {
-                    matchedItemValue.put(p.getItemName(), Double.parseDouble(itemWithTheirPrice.get(p.getItemName())));
+                if (menuItemFromDb.containsKey(p.getItemName())) {
+                    matchedItemValue.put(p.getItemName(), Double.parseDouble(menuItemFromDb.get(p.getItemName())));
                 }
             });
 
