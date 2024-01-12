@@ -6,6 +6,6 @@ import java.util.List;
 @Data
 public class OrderedFood {
 
-    private int tableNumber;
+    //private int tableNumber;
     private List<OrderedMenu> menu;
 }

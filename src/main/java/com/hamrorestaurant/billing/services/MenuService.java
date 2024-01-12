@@ -9,6 +9,9 @@ import java.util.List;
 public interface MenuService {
 
 
-    CommonResponse getCustomerMenuItem(List<OrderedFood> orderedFoods);
-     CommonResponse getCostOfEachItem(OrderedFood orderedFoods);
+    CommonResponse getCustomerMenuItem(int tableNumber, List<OrderedFood> orderedFoods);
+
+    CommonResponse getCostOfEachItem(int tableNumber,OrderedFood orderedFoods);
+
+    CommonResponse getTotalCostOfMenu(int tableNumber, OrderedFood orderedFoods);
 }

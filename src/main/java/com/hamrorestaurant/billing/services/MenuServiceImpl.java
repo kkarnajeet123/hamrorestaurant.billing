@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MenuServiceImpl implements MenuService {
@@ -20,7 +21,7 @@ public class MenuServiceImpl implements MenuService {
     private MenuRepository repo;
 
     @Override
-    public CommonResponse getCustomerMenuItem(List<OrderedFood> orderedFoods) {
+    public CommonResponse getCustomerMenuItem(int tableNumber, List<OrderedFood> orderedFoods) {
         CommonResponse response = new CommonResponse();
         Map<String, String> itemPrice = new HashMap<>();
         // Getting order item list
@@ -34,13 +35,14 @@ public class MenuServiceImpl implements MenuService {
         //Calculating Total Bill Amount
 //        calculatingTotalCost(calculatedTotalforEachItem);
         response.setData(calculatingTotalCost(calculatedTotalforEachItem));
-        response.setTableNumber(orderedFoods.stream().map(m -> m.getTableNumber()).findAny().orElse(null));
+        response.setTableNumber(tableNumber);
+        // response.setTableNumber(orderedFoods.stream().map(m -> m.getTableNumber()).findAny().orElse(null));
         //response.getBillingCommonResponse().setData(commonResponse);
         return response;
     }
 
     @Override
-    public CommonResponse getCostOfEachItem(OrderedFood orderedFoods) {
+    public CommonResponse getCostOfEachItem(int tableNumber, OrderedFood orderedFoods) {
         CommonResponse response = new CommonResponse();
         //checking if the requested menu name is available in db or not
         Map<String, Double> eachItemPriceMap = gettingEachItemPrice(getItemPriceFromDb(), orderedFoods.getMenu());
@@ -48,10 +50,22 @@ public class MenuServiceImpl implements MenuService {
         Map<String, Integer> eachMatchedItemCount = gettingEachMatchedItemCount(eachItemPriceMap, orderedFoods);
         //Map<String, Integer> eachItemCount= countOfEachOrder(orderedFoods);
         response.setData(getPricePerMenuItem(eachItemPriceMap, eachMatchedItemCount));
-        response.setTableNumber(orderedFoods.getTableNumber());
+        response.setTableNumber(tableNumber);
         //  List<Double>eachPriceCostList= calculateTotalPriceOfEachItem(eachItemPriceMap, countOfEachOrder(orderedFoods));
         //   calculatingTotalCost(eachPriceCostList);
         logger.info("The billing response is: " + response.getData());
+        return response;
+    }
+
+    @Override
+    public CommonResponse getTotalCostOfMenu(int tableNumber, OrderedFood orderedFoods) {
+        CommonResponse response = new CommonResponse();
+        List<OrderedFood> orderFoodList= Arrays.asList(orderedFoods);
+        Map<String, Integer> mapItemCount= getOrderItemCount(orderFoodList);
+        Map<String, Double> mapItemAndPrice = gettingEachItemPrice(getItemPriceFromDb(),orderedFoods.getMenu());
+        List<Double> costOfEachOrders =calculateTotalPriceOfEachItem(mapItemAndPrice, mapItemCount);
+        Double totalCost=calculatingTotalCost(costOfEachOrders);
+        response.setData(totalCost);
         return response;
     }
 
@@ -92,7 +106,7 @@ public class MenuServiceImpl implements MenuService {
         Map<String, String> itemPrice = new HashMap<>();
         List<MenuItem> menuItem = repo.findAll();
         menuItem.forEach(menu -> {
-            itemPrice.put(menu.getItemName(), menu.getPrice());
+            itemPrice.put(menu.getItemName().toLowerCase(), menu.getPrice());
         });
         return itemPrice;
     }
@@ -110,14 +124,12 @@ public class MenuServiceImpl implements MenuService {
 
     private Map<String, Double> gettingEachItemPrice(Map<String, String> menuItemFromDb, List<OrderedMenu> orderedFoods) {
         Map<String, Double> matchedItemValue = new HashMap<>();
-        for (OrderedMenu key : orderedFoods) {
             orderedFoods.forEach(p -> {
+                p.setItemName(p.getItemName().toLowerCase());
                 if (menuItemFromDb.containsKey(p.getItemName())) {
                     matchedItemValue.put(p.getItemName(), Double.parseDouble(menuItemFromDb.get(p.getItemName())));
                 }
             });
-
-        }
         return matchedItemValue;
     }
 
