@@ -65,6 +65,7 @@ public class MenuServiceImpl implements MenuService {
         Map<String, Double> mapItemAndPrice = gettingEachItemPrice(getItemPriceFromDb(),orderedFoods.getMenu());
         List<Double> costOfEachOrders =calculateTotalPriceOfEachItem(mapItemAndPrice, mapItemCount);
         Double totalCost=calculatingTotalCost(costOfEachOrders);
+        response.setTableNumber(tableNumber);
         response.setData(totalCost);
         return response;
     }
